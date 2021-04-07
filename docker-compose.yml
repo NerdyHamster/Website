@@ -22,7 +22,7 @@ services:
       - ./logs:/var/log/nginx
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.site.rule=Host(`template.localhost`)"
+      - "traefik.http.routers.site.rule=Host(`nerdyhamster.localhost`)"
       - "traefik.http.routers.site.entrypoints=http"
       - "traefik.docker.network=traefik"
       - "traefik.http.services.site-service.loadbalancer.server.port=80"
@@ -61,7 +61,7 @@ services:
       - 1025:1025
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.mailhog.rule=Host(`mail.template.localhost`)"
+      - "traefik.http.routers.mailhog.rule=Host(`mail.nerdyhamster.localhost`)"
       - "traefik.http.routers.mailhog.entrypoints=http"
       - "traefik.docker.network=traefik"
       - "traefik.http.services.mailhog-service.loadbalancer.server.port=8025"
