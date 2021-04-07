@@ -1,0 +1,70 @@
+version: '3'
+
+networks:
+  traefik:
+    external: true
+  pgsql:
+    external: true
+  laravel:
+
+volumes:
+  pgsql:
+
+
+services:
+  site:
+    build:
+      context: ./build
+      dockerfile: nginx.dockerfile
+    container_name: nginx
+    volumes:
+      - ./src:/var/www/html:delegated
+      - ./logs:/var/log/nginx
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.site.rule=Host(`template.localhost`)"
+      - "traefik.http.routers.site.entrypoints=http"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.services.site-service.loadbalancer.server.port=80"
+    depends_on:
+      - php
+      - redis
+      - mailhog
+    networks:
+      - laravel
+      - traefik
+
+  php:
+    build:
+      context: ./build
+      dockerfile: php.dockerfile
+    container_name: php
+    volumes:
+      - ./src:/var/www/html:delegated
+    networks:
+      - laravel
+      - pgsql
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - 6379:6379
+    networks:
+      - laravel
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: mailhog
+    ports:
+      - 1025:1025
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mailhog.rule=Host(`mail.template.localhost`)"
+      - "traefik.http.routers.mailhog.entrypoints=http"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.services.mailhog-service.loadbalancer.server.port=8025"
+    networks:
+      - laravel
+      - traefik
