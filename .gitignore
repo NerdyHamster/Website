@@ -2,3 +2,4 @@ psql/data
 .DS_Store
 .idea
 .env
+logs/
